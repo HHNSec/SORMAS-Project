@@ -2,8 +2,10 @@ package de.symeda.sormas.ui.importer;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +13,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -29,6 +32,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.ibm.icu.text.CharsetDetector;
+import com.ibm.icu.text.CharsetMatch;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
@@ -326,12 +331,23 @@ public abstract class DataImporter {
 	}
 
 	private CSVReader getCSVReader(File inputFile) throws IOException {
-		CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
+		CharsetDecoder decoder = detectCharset(inputFile).newDecoder();
 		InputStream inputStream = Files.newInputStream(inputFile.toPath());
 		BOMInputStream bomInputStream = new BOMInputStream(inputStream);
 		Reader reader = new InputStreamReader(bomInputStream, decoder);
 		BufferedReader bufferedReader = new BufferedReader(reader);
 		return CSVUtils.createCSVReader(bufferedReader, this.csvSeparator, new CSVCommentLineValidator());
+	}
+
+	private Charset detectCharset(File inputFile) {
+		try {
+			CharsetDetector charsetDetector = new CharsetDetector();
+			charsetDetector.setText(new BufferedInputStream(new FileInputStream(inputFile)));
+			CharsetMatch charsetMatch = charsetDetector.detect();
+			return Charset.forName(charsetMatch.getName());
+		} catch (Exception e) {
+			return StandardCharsets.UTF_8;
+		}
 	}
 
 	/**

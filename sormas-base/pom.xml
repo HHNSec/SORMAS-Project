@@ -139,6 +139,12 @@
 			</dependency>
 
 			<dependency>
+				<groupId>com.ibm.icu</groupId>
+				<artifactId>icu4j</artifactId>
+				<version>68.2</version>
+			</dependency>
+
+			<dependency>
 				<groupId>com.github.stephenc.jcip</groupId>
 				<artifactId>jcip-annotations</artifactId>
 				<version>1.0-1</version>
