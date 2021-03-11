@@ -50,9 +50,11 @@ import de.symeda.sormas.api.user.UserCriteria;
 import de.symeda.sormas.api.user.UserDto;
 import de.symeda.sormas.api.user.UserFacade;
 import de.symeda.sormas.api.user.UserReferenceDto;
+import de.symeda.sormas.api.user.UserRight;
 import de.symeda.sormas.api.user.UserRole;
-import de.symeda.sormas.api.user.UserRole.UserRoleValidationException;
 import de.symeda.sormas.api.user.UserSyncResult;
+import de.symeda.sormas.api.user.UserRole.UserRoleValidationException;
+import de.symeda.sormas.api.utils.DefaultPasswordHelper;
 import de.symeda.sormas.api.utils.DataHelper;
 import de.symeda.sormas.api.utils.PasswordHelper;
 import de.symeda.sormas.api.utils.SortProperty;
@@ -443,6 +445,29 @@ public class UserFacadeEjb implements UserFacade {
 		this.userUpdateEvent.fire(event);
 
 		return userSyncResult;
+	}
+
+	@Override
+	public List<UserDto> getUsersWithDefaultPassword() {
+		User currentUser = userService.getCurrentUser();
+		if (currentUser.getUserRoles().stream()
+				.anyMatch(r -> r.hasDefaultRight(UserRight.USER_EDIT))) {
+			// user is allowed to change all passwords
+			// a list of all users with a default password is returned
+			return userService.getAll().stream().filter(user -> DefaultPasswordHelper.isDefaultUser(user.getUserName())
+					&& DefaultPasswordHelper.usesDefaultPassword(user.getUserName(), user.getPassword(), user.getSeed())).map(UserFacadeEjb::toDto).collect(Collectors.toList());
+
+		} else {
+			// user has only access to himself
+			// the list will include him/her or will be empty
+			if (DefaultPasswordHelper.isDefaultUser(currentUser.getUserName())
+					&& DefaultPasswordHelper.usesDefaultPassword(currentUser.getUserName(), currentUser.getPassword(), currentUser.getSeed())) {
+				return Collections.singletonList(UserFacadeEjb.toDto(currentUser));
+			} else {
+				return Collections.emptyList();
+			}
+		}
+
 	}
 
 	@LocalBean
