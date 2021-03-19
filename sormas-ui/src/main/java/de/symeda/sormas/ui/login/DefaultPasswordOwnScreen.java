@@ -8,6 +8,7 @@ import de.symeda.sormas.ui.utils.ButtonHelper;
 
 public class DefaultPasswordOwnScreen extends Window {
     public DefaultPasswordOwnScreen(Runnable onContinue, UserDto currentUser) {
+        // caption security alert
         setCaption("Change password");
         setWidth(600.0f, Unit.PIXELS);
         final VerticalLayout content = new VerticalLayout();

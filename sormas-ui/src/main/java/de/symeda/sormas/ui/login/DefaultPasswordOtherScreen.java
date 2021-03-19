@@ -22,6 +22,8 @@ public class DefaultPasswordOtherScreen extends Window {
         defaultPasswordNotAllowedLabel.setWidthFull();
         content.addComponent(defaultPasswordNotAllowedLabel);
 
+        // generate all button
+        // copy paste sicherstellen
         Grid<UserDto> userGrid = new Grid<>();
         userGrid.setWidthFull();
         userGrid.setHeightFull();
@@ -32,6 +34,7 @@ public class DefaultPasswordOtherScreen extends Window {
             Label newPasswordLabel = new Label();
             Button generatePasswordButton = new Button("Generate", (Button.ClickListener) clickEvent -> {
                 clickEvent.getButton().setVisible(false);
+                // copy to clipboard
                 newPasswordLabel.setValue("new password: " + FacadeProvider.getUserFacade().resetPassword(user.getUuid()));
             });
             layout.addComponent(generatePasswordButton);

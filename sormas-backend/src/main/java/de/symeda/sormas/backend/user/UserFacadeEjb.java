@@ -454,14 +454,16 @@ public class UserFacadeEjb implements UserFacade {
 				.anyMatch(r -> r.hasDefaultRight(UserRight.USER_EDIT))) {
 			// user is allowed to change all passwords
 			// a list of all users with a default password is returned
-			return userService.getAll().stream().filter(user -> DefaultPasswordHelper.isDefaultUser(user.getUserName())
-					&& DefaultPasswordHelper.usesDefaultPassword(user.getUserName(), user.getPassword(), user.getSeed())).map(UserFacadeEjb::toDto).collect(Collectors.toList());
+			return userService.getAllDefaultUsers().stream().filter(user ->
+					DefaultPasswordHelper.usesDefaultPassword(user.getUserName(), user.getPassword(), user.getSeed()))
+					.map(UserFacadeEjb::toDto).collect(Collectors.toList());
 
 		} else {
 			// user has only access to himself
 			// the list will include him/her or will be empty
 			if (DefaultPasswordHelper.isDefaultUser(currentUser.getUserName())
-					&& DefaultPasswordHelper.usesDefaultPassword(currentUser.getUserName(), currentUser.getPassword(), currentUser.getSeed())) {
+					&& DefaultPasswordHelper.usesDefaultPassword(currentUser.getUserName(),
+					currentUser.getPassword(), currentUser.getSeed())) {
 				return Collections.singletonList(UserFacadeEjb.toDto(currentUser));
 			} else {
 				return Collections.emptyList();

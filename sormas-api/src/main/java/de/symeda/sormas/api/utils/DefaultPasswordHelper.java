@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class DefaultPasswordHelper {
 
@@ -32,6 +33,10 @@ public class DefaultPasswordHelper {
 
     public static Optional<String> getDefaultPassword(String username) {
         return Optional.ofNullable(defaultUsersWithPassword.get(username));
+    }
+
+    public static Set<String> getDefaultUserNames() {
+        return defaultUsersWithPassword.keySet();
     }
 
     public static boolean usesDefaultPassword(String username, String passwordHash, String seed) {
