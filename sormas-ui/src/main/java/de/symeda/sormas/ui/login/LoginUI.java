@@ -65,7 +65,7 @@ public class LoginUI extends UI {
 
 		setContent(
 				new LoginScreen(
-						DefaultPasswordHelper.getInterceptionLoginListener(
+						DefaultPasswordUIHelper.getInterceptionLoginListener(
 							(LoginListener) () -> UI.getCurrent().getPage().setLocation(
 								VaadinServletService.getCurrentServletRequest().getContextPath() + "#"
 									+ DataHelper.toStringNullable(UI.getCurrent().getPage().getUriFragment())),
