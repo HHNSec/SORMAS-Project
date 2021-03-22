@@ -21,7 +21,6 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +30,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -127,10 +127,9 @@ public class UserFacadeEjbTest extends AbstractBeanTest {
         Set<User> defaultUsers = UserTestHelper.generateDefaultUsers(true);
         Set<User> randomUsers = UserTestHelper.generateRandomUsers(30);
 
-        Set<User> testUsers = new HashSet<>();
+        List<User> testUsers = new ArrayList<>();
         testUsers.addAll(defaultUsers);
         testUsers.addAll(randomUsers);
-
 
         for (User user : testUsers) {
             Mockito.when(userService.getCurrentUser()).thenReturn(user);
@@ -142,11 +141,14 @@ public class UserFacadeEjbTest extends AbstractBeanTest {
                 assertEquals(0, userFacadeEjb.getUsersWithDefaultPassword().size());
             }
 
-            Mockito.when(userService.getAllDefaultUsers()).thenReturn(new ArrayList<>(defaultUsers));
+            Mockito.when(userService.getAllDefaultUsers()).thenReturn(testUsers);
             if (user.hasAnyUserRole(UserRole.ADMIN)) {
                 assertEquals(defaultUsers.size(), userFacadeEjb.getUsersWithDefaultPassword().size());
                 for (User defUser : defaultUsers) {
                     assertTrue(userFacadeEjb.getUsersWithDefaultPassword().contains(UserFacadeEjb.toDto(defUser)));
+                }
+                for (User randomUser : randomUsers) {
+                    assertFalse(userFacadeEjb.getUsersWithDefaultPassword().contains(UserFacadeEjb.toDto(randomUser)));
                 }
 
             } else if (defaultUsers.contains(user)) {
