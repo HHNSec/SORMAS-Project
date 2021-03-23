@@ -4,7 +4,9 @@ import de.symeda.sormas.api.user.UserDto;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,77 +30,49 @@ public class DefaultUserHelperTest {
     private static final String DEFAUTL_HOSP_INF_USER_PASS = "HospInf";
     private static final String DEFAUTL_POE_INF_USER_PASS = "PoeInf";
 
+    private static final int COUNT_OF_DEFAULT_ACCOUNTS = 12;
+
+    private static final Map<String, String> DEFAULT_USERS  = new HashMap<>() {{
+        put(DEFAULT_ADMIN_USERNAME, DEFAULT_ADMIN_PASS);
+        put(DEFAUTL_SURV_SUP_USER_PASS, DEFAUTL_SURV_SUP_USER_PASS);
+        put(DEFAUTL_CASE_SUP_USER_PASS, DEFAUTL_CASE_SUP_USER_PASS);
+        put(DEFAUTL_CONT_SUP_USER_PASS, DEFAUTL_CONT_SUP_USER_PASS);
+        put(DEFAUTL_POE_SUP_USER_PASS, DEFAUTL_POE_SUP_USER_PASS);
+        put(DEFAUTL_LAB_OFF_USER_PASS, DEFAUTL_LAB_OFF_USER_PASS);
+        put(DEFAUTL_EVE_OFF_USER_PASS, DEFAUTL_EVE_OFF_USER_PASS);
+        put(DEFAUTL_NAT_USER_USER_PASS, DEFAUTL_NAT_USER_USER_PASS);
+        put(DEFAUTL_NAT_CLIN_USER_PASS, DEFAUTL_NAT_CLIN_USER_PASS);
+        put(DEFAUTL_SURV_OFF_USER_PASS, DEFAUTL_SURV_OFF_USER_PASS);
+        put(DEFAUTL_HOSP_INF_USER_PASS, DEFAUTL_HOSP_INF_USER_PASS);
+        put(DEFAUTL_POE_INF_USER_PASS, DEFAUTL_POE_INF_USER_PASS);
+    }};
+
     @Test
     public void isDefaultUser() {
-        assertTrue(DefaultUserHelper.isDefaultUser(DEFAULT_ADMIN_USERNAME));
-        assertTrue(DefaultUserHelper.isDefaultUser(DEFAUTL_SURV_SUP_USER_PASS));
-        assertTrue(DefaultUserHelper.isDefaultUser(DEFAUTL_CASE_SUP_USER_PASS));
-        assertTrue(DefaultUserHelper.isDefaultUser(DEFAUTL_CONT_SUP_USER_PASS));
-        assertTrue(DefaultUserHelper.isDefaultUser(DEFAUTL_POE_SUP_USER_PASS));
-        assertTrue(DefaultUserHelper.isDefaultUser(DEFAUTL_LAB_OFF_USER_PASS));
-        assertTrue(DefaultUserHelper.isDefaultUser(DEFAUTL_EVE_OFF_USER_PASS));
-        assertTrue(DefaultUserHelper.isDefaultUser(DEFAUTL_NAT_USER_USER_PASS));
-        assertTrue(DefaultUserHelper.isDefaultUser(DEFAUTL_NAT_CLIN_USER_PASS));
-        assertTrue(DefaultUserHelper.isDefaultUser(DEFAUTL_SURV_OFF_USER_PASS));
-        assertTrue(DefaultUserHelper.isDefaultUser(DEFAUTL_HOSP_INF_USER_PASS));
-        assertTrue(DefaultUserHelper.isDefaultUser(DEFAUTL_POE_INF_USER_PASS));
+        for (String defaultUser : DEFAULT_USERS.keySet()) {
+            assertTrue(DefaultUserHelper.isDefaultUser(defaultUser));
+        }
     }
 
     @Test
     public void getDefaultPassword() {
-        assertEquals(DEFAULT_ADMIN_PASS, DefaultUserHelper.getDefaultPassword(DEFAULT_ADMIN_USERNAME).orElse(""));
-        assertEquals(DEFAUTL_SURV_SUP_USER_PASS, DefaultUserHelper.getDefaultPassword(DEFAUTL_SURV_SUP_USER_PASS).orElse(""));
-        assertEquals(DEFAUTL_CASE_SUP_USER_PASS, DefaultUserHelper.getDefaultPassword(DEFAUTL_CASE_SUP_USER_PASS).orElse(""));
-        assertEquals(DEFAUTL_CONT_SUP_USER_PASS, DefaultUserHelper.getDefaultPassword(DEFAUTL_CONT_SUP_USER_PASS).orElse(""));
-        assertEquals(DEFAUTL_POE_SUP_USER_PASS, DefaultUserHelper.getDefaultPassword(DEFAUTL_POE_SUP_USER_PASS).orElse(""));
-        assertEquals(DEFAUTL_LAB_OFF_USER_PASS, DefaultUserHelper.getDefaultPassword(DEFAUTL_LAB_OFF_USER_PASS).orElse(""));
-        assertEquals(DEFAUTL_EVE_OFF_USER_PASS, DefaultUserHelper.getDefaultPassword(DEFAUTL_EVE_OFF_USER_PASS).orElse(""));
-        assertEquals(DEFAUTL_NAT_USER_USER_PASS, DefaultUserHelper.getDefaultPassword(DEFAUTL_NAT_USER_USER_PASS).orElse(""));
-        assertEquals(DEFAUTL_NAT_CLIN_USER_PASS, DefaultUserHelper.getDefaultPassword(DEFAUTL_NAT_CLIN_USER_PASS).orElse(""));
-        assertEquals(DEFAUTL_SURV_OFF_USER_PASS, DefaultUserHelper.getDefaultPassword(DEFAUTL_SURV_OFF_USER_PASS).orElse(""));
-        assertEquals(DEFAUTL_HOSP_INF_USER_PASS, DefaultUserHelper.getDefaultPassword(DEFAUTL_HOSP_INF_USER_PASS).orElse(""));
-        assertEquals(DEFAUTL_POE_INF_USER_PASS, DefaultUserHelper.getDefaultPassword(DEFAUTL_POE_INF_USER_PASS).orElse(""));
+        for (String defaultUser : DEFAULT_USERS.keySet()) {
+            assertEquals(DEFAULT_USERS.get(defaultUser), DefaultUserHelper.getDefaultPassword(defaultUser).orElse(""));
+        }
+    }
+
+    private void testUsesDefaultPasswordHelper(String username, String defaultPassword) {
+        String seed = UUID.randomUUID().toString();
+        String randomPass = UUID.randomUUID().toString();
+        assertTrue(DefaultUserHelper.usesDefaultPassword(username, PasswordHelper.encodePassword(defaultPassword, seed), seed));
+        assertFalse(DefaultUserHelper.usesDefaultPassword(username, PasswordHelper.encodePassword(randomPass, seed), seed));
     }
 
     @Test
     public void usesDefaultPassword() {
-        String seed = UUID.randomUUID().toString();
-        String randomPass = UUID.randomUUID().toString();
-        assertTrue(DefaultUserHelper.usesDefaultPassword(DEFAULT_ADMIN_USERNAME, PasswordHelper.encodePassword(DEFAULT_ADMIN_PASS, seed), seed));
-        assertFalse(DefaultUserHelper.usesDefaultPassword(DEFAULT_ADMIN_USERNAME, PasswordHelper.encodePassword(randomPass, seed), seed));
-
-        assertTrue(DefaultUserHelper.usesDefaultPassword(DEFAUTL_SURV_SUP_USER_PASS, PasswordHelper.encodePassword(DEFAUTL_SURV_SUP_USER_PASS, seed), seed));
-        assertFalse(DefaultUserHelper.usesDefaultPassword(DEFAUTL_SURV_SUP_USER_PASS, PasswordHelper.encodePassword(randomPass, seed), seed));
-
-        assertTrue(DefaultUserHelper.usesDefaultPassword(DEFAUTL_CASE_SUP_USER_PASS, PasswordHelper.encodePassword(DEFAUTL_CASE_SUP_USER_PASS, seed), seed));
-        assertFalse(DefaultUserHelper.usesDefaultPassword(DEFAUTL_CASE_SUP_USER_PASS, PasswordHelper.encodePassword(randomPass, seed), seed));
-
-        assertTrue(DefaultUserHelper.usesDefaultPassword(DEFAUTL_CONT_SUP_USER_PASS, PasswordHelper.encodePassword(DEFAUTL_CONT_SUP_USER_PASS, seed), seed));
-        assertFalse(DefaultUserHelper.usesDefaultPassword(DEFAUTL_CONT_SUP_USER_PASS, PasswordHelper.encodePassword(randomPass, seed), seed));
-
-        assertTrue(DefaultUserHelper.usesDefaultPassword(DEFAUTL_POE_SUP_USER_PASS, PasswordHelper.encodePassword(DEFAUTL_POE_SUP_USER_PASS, seed), seed));
-        assertFalse(DefaultUserHelper.usesDefaultPassword(DEFAUTL_POE_SUP_USER_PASS, PasswordHelper.encodePassword(randomPass, seed), seed));
-
-        assertTrue(DefaultUserHelper.usesDefaultPassword(DEFAUTL_LAB_OFF_USER_PASS, PasswordHelper.encodePassword(DEFAUTL_LAB_OFF_USER_PASS, seed), seed));
-        assertFalse(DefaultUserHelper.usesDefaultPassword(DEFAUTL_LAB_OFF_USER_PASS, PasswordHelper.encodePassword(randomPass, seed), seed));
-
-        assertTrue(DefaultUserHelper.usesDefaultPassword(DEFAUTL_EVE_OFF_USER_PASS, PasswordHelper.encodePassword(DEFAUTL_EVE_OFF_USER_PASS, seed), seed));
-        assertFalse(DefaultUserHelper.usesDefaultPassword(DEFAUTL_EVE_OFF_USER_PASS, PasswordHelper.encodePassword(randomPass, seed), seed));
-
-        assertTrue(DefaultUserHelper.usesDefaultPassword(DEFAUTL_NAT_USER_USER_PASS, PasswordHelper.encodePassword(DEFAUTL_NAT_USER_USER_PASS, seed), seed));
-        assertFalse(DefaultUserHelper.usesDefaultPassword(DEFAUTL_NAT_USER_USER_PASS, PasswordHelper.encodePassword(randomPass, seed), seed));
-
-        assertTrue(DefaultUserHelper.usesDefaultPassword(DEFAUTL_NAT_CLIN_USER_PASS, PasswordHelper.encodePassword(DEFAUTL_NAT_CLIN_USER_PASS, seed), seed));
-        assertFalse(DefaultUserHelper.usesDefaultPassword(DEFAUTL_NAT_CLIN_USER_PASS, PasswordHelper.encodePassword(randomPass, seed), seed));
-
-        assertTrue(DefaultUserHelper.usesDefaultPassword(DEFAUTL_SURV_OFF_USER_PASS, PasswordHelper.encodePassword(DEFAUTL_SURV_OFF_USER_PASS, seed), seed));
-        assertFalse(DefaultUserHelper.usesDefaultPassword(DEFAUTL_SURV_OFF_USER_PASS, PasswordHelper.encodePassword(randomPass, seed), seed));
-
-        assertTrue(DefaultUserHelper.usesDefaultPassword(DEFAUTL_HOSP_INF_USER_PASS, PasswordHelper.encodePassword(DEFAUTL_HOSP_INF_USER_PASS, seed), seed));
-        assertFalse(DefaultUserHelper.usesDefaultPassword(DEFAUTL_HOSP_INF_USER_PASS, PasswordHelper.encodePassword(randomPass, seed), seed));
-
-        assertTrue(DefaultUserHelper.usesDefaultPassword(DEFAUTL_POE_INF_USER_PASS, PasswordHelper.encodePassword(DEFAUTL_POE_INF_USER_PASS, seed), seed));
-        assertFalse(DefaultUserHelper.usesDefaultPassword(DEFAUTL_POE_INF_USER_PASS, PasswordHelper.encodePassword(randomPass, seed), seed));
+        for (String defaultUser : DEFAULT_USERS.keySet()) {
+            testUsesDefaultPasswordHelper(defaultUser, DEFAULT_USERS.get(defaultUser));
+        }
     }
 
     @Test
@@ -126,28 +100,19 @@ public class DefaultUserHelperTest {
         randomUser.setUserName(UUID.randomUUID().toString());
 
         assertTrue(DefaultUserHelper.otherUsersWithDefaultPassword(defaultDtos, randomUser));
-        assertFalse(DefaultUserHelper.otherUsersWithDefaultPassword(defaultDtos,admin));
+        assertFalse(DefaultUserHelper.otherUsersWithDefaultPassword(defaultDtos, admin));
         defaultDtos.add(randomUser);
-        assertTrue(DefaultUserHelper.otherUsersWithDefaultPassword(defaultDtos,admin));
+        assertTrue(DefaultUserHelper.otherUsersWithDefaultPassword(defaultDtos, admin));
         assertTrue(DefaultUserHelper.otherUsersWithDefaultPassword(defaultDtos, randomUser));
         assertFalse(DefaultUserHelper.otherUsersWithDefaultPassword(new ArrayList<>(), admin));
     }
 
     @Test
-    public void getDefaultUserNames(){
-        assertEquals(12,DefaultUserHelper.getDefaultUserNames().size());
-        Set<String> defaultNames = DefaultUserHelper.getDefaultUserNames();
-        assertTrue(defaultNames.contains(DEFAULT_ADMIN_USERNAME));
-        assertTrue(defaultNames.contains(DEFAUTL_SURV_SUP_USER_PASS));
-        assertTrue(defaultNames.contains(DEFAUTL_CASE_SUP_USER_PASS));
-        assertTrue(defaultNames.contains(DEFAUTL_CONT_SUP_USER_PASS));
-        assertTrue(defaultNames.contains(DEFAUTL_POE_SUP_USER_PASS));
-        assertTrue(defaultNames.contains(DEFAUTL_LAB_OFF_USER_PASS));
-        assertTrue(defaultNames.contains(DEFAUTL_EVE_OFF_USER_PASS));
-        assertTrue(defaultNames.contains(DEFAUTL_NAT_USER_USER_PASS));
-        assertTrue(defaultNames.contains(DEFAUTL_NAT_CLIN_USER_PASS));
-        assertTrue(defaultNames.contains(DEFAUTL_SURV_OFF_USER_PASS));
-        assertTrue(defaultNames.contains(DEFAUTL_HOSP_INF_USER_PASS));
-        assertTrue(defaultNames.contains(DEFAUTL_POE_INF_USER_PASS));
+    public void getDefaultUserNames() {
+        assertEquals(COUNT_OF_DEFAULT_ACCOUNTS, DefaultUserHelper.getDefaultUserNames().size());
+        Set<String> result = DefaultUserHelper.getDefaultUserNames();
+        for (String defaultUser : DEFAULT_USERS.keySet()) {
+            assertTrue(result.contains(defaultUser));
+        }
     }
 }
